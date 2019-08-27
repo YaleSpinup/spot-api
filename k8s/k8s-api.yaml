@@ -1,0 +1,74 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: spotapi
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /v1/spot
+        backend:
+          serviceName: spotapi
+          servicePort: http-spotapi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spotapi
+  labels:
+    app: spotapi
+    tier: api
+spec:
+  selector:
+    app: spotapi
+    tier: api
+  ports:
+    - name: http-spotapi
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spotapi
+  labels:
+    app: spotapi
+    tier: api
+spec:
+  selector:
+    matchLabels:
+      app: spotapi
+      tier: api
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: spotapi
+        tier: api
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: spotapi
+        image: hub.docker.com/yaleits/spotapi
+        volumeMounts:
+        - name: spotapi-config
+          mountPath: "/app/config"
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /v1/spot/ping
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 3
+      volumes:
+      - name: spotapi-config
+        secret:
+          secretName: spot-api-config-json
+        # envFrom:
+        #   - configMapRef:
+        #       name: spotapi-config
+        #   - secretRef:
+        #       name: spotapi-secrets
