@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/YaleSpinup/spot-api/common"
+	"github.com/YaleSpinup/spot-api/spotinst"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
@@ -15,9 +16,10 @@ import (
 )
 
 type server struct {
-	router  *mux.Router
-	version common.Version
-	context context.Context
+	elastigroupServices map[string]spotinst.Elastigroup
+	router              *mux.Router
+	version             common.Version
+	context             context.Context
 }
 
 // Org will carry throughout the api and get tagged on resources
@@ -30,9 +32,10 @@ func NewServer(config common.Config) error {
 	defer cancel()
 
 	s := server{
-		router:  mux.NewRouter(),
-		version: config.Version,
-		context: ctx,
+		elastigroupServices: make(map[string]spotinst.Elastigroup),
+		router:              mux.NewRouter(),
+		version:             config.Version,
+		context:             ctx,
 	}
 
 	if config.Org == "" {
@@ -42,7 +45,8 @@ func NewServer(config common.Config) error {
 
 	// Create a shared S3 session
 	for name, c := range config.Accounts {
-		log.Debugf("Creating new Spot service for account '%s' with key '%s' in region '%s' (org: %s)", name, c.Akid, c.Region, Org)
+		log.Debugf("Creating new Spot service for account '%s' with id %s (org: %s)", name, c.Id, Org)
+		s.elastigroupServices[name] = spotinst.NewElastigroupSession(c)
 	}
 
 	publicURLs := map[string]string{
