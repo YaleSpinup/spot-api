@@ -26,6 +26,8 @@ func (e *Elastigroup) GetAWSElastigroupByID(ctx context.Context, id string) (*aw
 		return nil, apierror.New(apierror.ErrBadRequest, "invalid input", nil)
 	}
 
+	log.Infof("getting details about aws elastigroup: %s", id)
+
 	output, err := e.Service.CloudProviderAWS().Read(ctx, &aws.ReadGroupInput{
 		GroupID: spotinst.String(id),
 	})
@@ -42,6 +44,8 @@ func (e *Elastigroup) CreateAWSElastigroup(ctx context.Context, group *aws.Group
 		return nil, apierror.New(apierror.ErrBadRequest, "invalid input", nil)
 	}
 
+	log.Infof("creating aws elastigroup with input: %+v", group)
+
 	output, err := e.Service.CloudProviderAWS().Create(ctx, &aws.CreateGroupInput{
 		Group: group,
 	})
@@ -51,4 +55,26 @@ func (e *Elastigroup) CreateAWSElastigroup(ctx context.Context, group *aws.Group
 	}
 
 	return output.Group, nil
+}
+
+func (e *Elastigroup) DeleteAWSElastigroupByID(ctx context.Context, id string) error {
+	if id == "" {
+		return apierror.New(apierror.ErrBadRequest, "invalid input", nil)
+	}
+
+	_, err := e.Service.CloudProviderAWS().Delete(ctx, &aws.DeleteGroupInput{
+		GroupID: spotinst.String(id),
+		StatefulDeallocation: &aws.StatefulDeallocation{
+			ShouldDeleteImages:            spotinst.Bool(true),
+			ShouldDeleteNetworkInterfaces: spotinst.Bool(true),
+			ShouldDeleteVolumes:           spotinst.Bool(true),
+			ShouldDeleteSnapshots:         spotinst.Bool(true),
+		},
+	})
+
+	if err != nil {
+		return ErrCode("failed to read elastigroup details", err)
+	}
+
+	return nil
 }

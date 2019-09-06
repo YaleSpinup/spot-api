@@ -116,3 +116,27 @@ func (s *server) ElastigroupCreateHandler(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 	w.Write(j)
 }
+
+// ElastigroupDeleteHandler handles deleting an elastigroup from SpotInst
+func (s *server) ElastigroupDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	w = LogWriter{w}
+	vars := mux.Vars(r)
+	account := vars["account"]
+	esService, ok := s.elastigroupServices[account]
+	if !ok {
+		log.Errorf("account not found: %s", account)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	elastigroup := vars["elastigroup"]
+
+	err := esService.DeleteAWSElastigroupByID(r.Context(), elastigroup)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+}

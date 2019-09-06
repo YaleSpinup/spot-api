@@ -15,3 +15,7 @@ func TestGetAWSElastigroup(t *testing.T) {
 func TestCreateAWSElastigroup(t *testing.T) {
 	t.Log("TODO")
 }
+
+func TestDeleteAWSElastigroup(t *testing.T) {
+	t.Log("TODO")
+}
