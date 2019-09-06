@@ -11,8 +11,7 @@ import (
 
 // Elastigroup is a wrapper around the spotinst elastigroup service and the provider type (eg. aws, azure, gcp, etc)
 type Elastigroup struct {
-	Service  elastigroup.Service
-	Provider string
+	Service elastigroup.Service
 }
 
 // NewElastigroupSession creates a new elastigroup session
@@ -23,6 +22,5 @@ func NewElastigroupSession(account common.Account) Elastigroup {
 		Credentials: credentials.NewStaticCredentials(account.Token, account.Id),
 	})
 	e.Service = elastigroup.New(sess)
-	e.Provider = "aws"
 	return e
 }
