@@ -22,8 +22,8 @@ type Config struct {
 type Account struct {
 	Endpoint string
 	Region   string
-	Akid     string
-	Secret   string
+	Id       string
+	Token    string
 }
 
 // Version carries around the API version information
