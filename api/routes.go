@@ -15,6 +15,7 @@ func (s *server) routes() {
 	// elastigroup handlers
 	api.HandleFunc("/{account}/elastigroups", s.ElastigroupsListHandler).Methods(http.MethodGet)
 	api.HandleFunc("/{account}/elastigroups", s.ElastigroupCreateHandler).Methods(http.MethodPost)
+	api.HandleFunc("/{account}/elastigroups/{elastigroup}", s.ElastigroupUpdateHandler).Methods(http.MethodPut)
 	api.HandleFunc("/{account}/elastigroups/{elastigroup}", s.ElastigroupShowHandler).Methods(http.MethodGet)
 	api.HandleFunc("/{account}/elastigroups/{elastigroup}", s.ElastigroupDeleteHandler).Methods(http.MethodDelete)
 	// api.HandleFunc("/{account}/elastigroups/{elastigroup}", s.ElastigrouptUpdateHandler).Methods(http.MethodPut)
