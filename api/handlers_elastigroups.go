@@ -87,8 +87,11 @@ func (s *server) ElastigroupUpdateHandler(w http.ResponseWriter, r *http.Request
 	esService, ok := s.elastigroupServices[account]
 	if !ok {
 		log.Errorf("account not found: %s", account)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+
+	elastigroup := vars["elastigroup"]
 
 	req := aws.Group{}
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -97,6 +100,8 @@ func (s *server) ElastigroupUpdateHandler(w http.ResponseWriter, r *http.Request
 		handleError(w, apierror.New(apierror.ErrBadRequest, msg, err))
 		return
 	}
+
+	req.ID = spotinst.String(elastigroup)
 
 	output, err := esService.UpdateAWSElastigroup(r.Context(), &req)
 	if err != nil {
