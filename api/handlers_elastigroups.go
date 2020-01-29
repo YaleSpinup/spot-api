@@ -101,17 +101,19 @@ func (s *server) ElastigroupUpdateHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// assert {elastigroup} from querystring route on req object
 	req.ID = spotinst.String(elastigroup)
 
 	output, err := esService.UpdateAWSElastigroup(r.Context(), &req)
 	if err != nil {
-		handleError(w, err)
+		msg := fmt.Sprintf("%s", err)
+		handleError(w, apierror.New(apierror.ErrBadRequest, msg, err))
 		return
 	}
 
 	j, err := json.Marshal(output)
 	if err != nil {
-		log.Errorf("cannot marshal response (%v) into JSON: %s", output, err)
+		handleError(w, err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
