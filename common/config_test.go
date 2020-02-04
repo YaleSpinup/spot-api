@@ -34,13 +34,9 @@ func TestReadConfig(t *testing.T) {
 		Accounts: map[string]Account{
 			"provider1": Account{
 				Region: "us-east-1",
-				Akid:   "key1",
-				Secret: "secret1",
 			},
 			"provider2": Account{
 				Region: "us-west-1",
-				Akid:   "key2",
-				Secret: "secret2",
 			},
 		},
 		Token:    "SEKRET",
