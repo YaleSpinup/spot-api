@@ -79,7 +79,51 @@ func (s *server) ElastigroupShowHandler(w http.ResponseWriter, r *http.Request) 
 	w.Write(j)
 }
 
-// ElastgroupCreateHandler handles creating an elastigroup in SpotInst
+// ElastigroupUpdateHandler handles updating an elastigroup in SpotInst
+func (s *server) ElastigroupUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	w = LogWriter{w}
+	vars := mux.Vars(r)
+	account := vars["account"]
+	esService, ok := s.elastigroupServices[account]
+	if !ok {
+		log.Errorf("account not found: %s", account)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	elastigroup := vars["elastigroup"]
+
+	req := aws.Group{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		msg := fmt.Sprintf("cannot decode body into update elastigroup input: %s", err)
+		handleError(w, apierror.New(apierror.ErrBadRequest, msg, err))
+		return
+	}
+
+	// assert {elastigroup} from querystring route on req object
+	req.ID = spotinst.String(elastigroup)
+
+	output, err := esService.UpdateAWSElastigroup(r.Context(), &req)
+	if err != nil {
+		msg := fmt.Sprintf("%s", err)
+		handleError(w, apierror.New(apierror.ErrBadRequest, msg, err))
+		return
+	}
+
+	j, err := json.Marshal(output)
+	if err != nil {
+		handleError(w, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(j)
+}
+
+// ElastigroupCreateHandler handles creating an elastigroup in SpotInst
 func (s *server) ElastigroupCreateHandler(w http.ResponseWriter, r *http.Request) {
 	w = LogWriter{w}
 	vars := mux.Vars(r)

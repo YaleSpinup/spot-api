@@ -9,6 +9,7 @@ import (
 	"github.com/spotinst/spotinst-sdk-go/spotinst"
 )
 
+// ListAWSElastigroups lists existing elastigroups
 func (e *Elastigroup) ListAWSElastigroups(ctx context.Context) ([]*aws.Group, error) {
 	log.Info("listing aws elastigroups")
 
@@ -21,6 +22,7 @@ func (e *Elastigroup) ListAWSElastigroups(ctx context.Context) ([]*aws.Group, er
 	return output.Groups, err
 }
 
+// GetAWSElastigroupByID gets details of existing elastigroup by id
 func (e *Elastigroup) GetAWSElastigroupByID(ctx context.Context, id string) (*aws.Group, error) {
 	if id == "" {
 		return nil, apierror.New(apierror.ErrBadRequest, "invalid input", nil)
@@ -39,6 +41,25 @@ func (e *Elastigroup) GetAWSElastigroupByID(ctx context.Context, id string) (*aw
 	return output.Group, nil
 }
 
+// UpdateAWSElastigroup updates facets on an elastigroup
+func (e *Elastigroup) UpdateAWSElastigroup(ctx context.Context, group *aws.Group) (*aws.Group, error) {
+	if group == nil {
+		return nil, apierror.New(apierror.ErrBadRequest, "invalid input", nil)
+	}
+
+	log.Infof("updating aws elastigroup with input: %+v", group)
+
+	output, err := e.Service.CloudProviderAWS().Update(ctx, &aws.UpdateGroupInput{
+		Group: group,
+	})
+	if err != nil {
+		return nil, ErrCode("failed to update elastigroup", err)
+	}
+
+	return output.Group, nil
+}
+
+// CreateAWSElastigroup creates an elasticgroup
 func (e *Elastigroup) CreateAWSElastigroup(ctx context.Context, group *aws.Group) (*aws.Group, error) {
 	if group == nil {
 		return nil, apierror.New(apierror.ErrBadRequest, "invalid input", nil)
@@ -51,12 +72,13 @@ func (e *Elastigroup) CreateAWSElastigroup(ctx context.Context, group *aws.Group
 	})
 
 	if err != nil {
-		return nil, ErrCode("failed tocreate elastigroup", err)
+		return nil, ErrCode("failed to create elastigroup", err)
 	}
 
 	return output.Group, nil
 }
 
+// DeleteAWSElastigroupByID deletes an elastigroup by id
 func (e *Elastigroup) DeleteAWSElastigroupByID(ctx context.Context, id string) error {
 	if id == "" {
 		return apierror.New(apierror.ErrBadRequest, "invalid input", nil)
