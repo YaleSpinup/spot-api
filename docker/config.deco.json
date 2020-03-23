@@ -3,8 +3,6 @@
   "accounts": {
     "{{ .spot_account_id }}": {
       "region": "us-east-1",
-      "akid": "{{ .spinup_akid }}",
-      "secret": "{{ .spinup_secret }}",
       "id": "{{ .spot_account_id }}",
       "token": "{{ .spot_token }}"
     }
