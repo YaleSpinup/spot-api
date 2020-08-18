@@ -26,6 +26,8 @@ WORKDIR /app
 COPY --from=build-env /app/api.out /app/api
 RUN chmod 555 /app/api
 
+RUN apk add --no-cache bash ca-certificates
+
 # Install Deco
 ARG DECO_VERSION=1.0.2
 ARG DECO_OS=linux
