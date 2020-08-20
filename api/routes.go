@@ -18,5 +18,11 @@ func (s *server) routes() {
 	api.HandleFunc("/{account}/elastigroups/{elastigroup}", s.ElastigroupUpdateHandler).Methods(http.MethodPut)
 	api.HandleFunc("/{account}/elastigroups/{elastigroup}", s.ElastigroupShowHandler).Methods(http.MethodGet)
 	api.HandleFunc("/{account}/elastigroups/{elastigroup}", s.ElastigroupDeleteHandler).Methods(http.MethodDelete)
-	// api.HandleFunc("/{account}/elastigroups/{elastigroup}", s.ElastigrouptUpdateHandler).Methods(http.MethodPut)
+
+	// managedinstance handlers
+	api.HandleFunc("/{account}/managedinstances", s.ManagedInstanceListHandler).Methods(http.MethodGet)
+	api.HandleFunc("/{account}/managedinstances", s.ManagedInstanceCreateHandler).Methods(http.MethodPost)
+	api.HandleFunc("/{account}/managedinstances/{managedinstance}", s.ManagedInstanceUpdateHandler).Methods(http.MethodPut)
+	api.HandleFunc("/{account}/managedinstances/{managedinstance}", s.ManagedInstanceShowHandler).Methods(http.MethodGet)
+	api.HandleFunc("/{account}/managedinstances/{managedinstance}", s.ManagedInstanceDeleteHandler).Methods(http.MethodDelete)
 }

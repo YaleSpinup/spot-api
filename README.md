@@ -8,13 +8,21 @@ This API provides simple restful API access to SpotInst Spot market services.
 GET /v1/spot/ping
 GET /v1/spot/version
 GET /v1/spot/metrics
+
 GET /v1/spot/{account}/elastigroups
 POST /v1/spot/{account}/elastigroups
 PUT /v1/spot/{account}/elastigroups/{elastigroup}
 DELETE /v1/spot/{account}/elastigroups/{elastigroup}
+
+GET /v1/spot/{account}/managedinstances
+POST /v1/spot/{account}/managedinstances
+PUT /v1/spot/{account}/managedinstances/{managedinstance}
+DELETE /v1/spot/{account}/managedinstances/{managedinstance}
 ```
 
 ## Examples
+
+### Elastigroups
 
 Example request body of new elastigroup (POST):
 
@@ -101,9 +109,9 @@ Example request body of elastigroup update (PUT):
       "ondemand": "t3.micro",
       "spot": [
   	    "t3.micro",
-	    "t3a.micro",
-	    "t3a.nano",
-	    "t3.nano"
+        "t3a.micro",
+        "t3a.nano",
+        "t3.nano"
       ]
     },
     "launchSpecification": {
@@ -118,15 +126,104 @@ Example request body of elastigroup update (PUT):
 }
 ```
 
+### Managed Instances
+
+Example request body of new managed instance (POST):
+
+```json
+{
+  "region": "us-east-1",
+  "name": "mi-test",
+  "description": "My new Spot Instance",
+  "strategy": {
+    "revertToSpot": {
+      "performAt": "always"
+    }
+  },
+  "persistence": {
+    "persistPrivateIp": true,
+    "persistBlockDevices": true,
+    "persistRootDevice": true,
+    "blockDevicesMode": "onLaunch"
+  },
+  "healthCheck": {
+    "type": "EC2",
+    "autoHealing": true,
+    "gracePeriod": 120,
+    "unhealthyDuration": 120
+  },
+  "compute": {
+    "product": "Linux/UNIX",
+    "subnetIds": [
+      "subnet-0123456789abcdef0"
+    ],
+    "vpcId": "vpc-0123456789abcdef0",
+    "launchSpecification": {
+      "instanceTypes": {
+        "preferredType": "t3a.micro",
+        "types": [
+          "t3a.micro",
+          "t3.micro",
+          "t2.micro"
+        ]
+      },
+      "securityGroupIds": [
+        "sg-0123456789abcdef0"
+      ],
+      "imageId": "ami-02354e95b39ca8dec",
+      "keyPair": null,
+      "tags": [
+        {
+          "tagKey": "CreatedBy",
+          "tagValue": "me"
+        }
+      ],
+      "networkInterfaces": [
+        {
+          "associateIpv6Address": false,
+          "deviceIndex": 0
+        }
+      ],
+      "creditSpecification": {
+        "cpuCredits": "standard"
+      },
+      "shutdownScript": null,
+      "userData": null
+    },
+    "privateIp": null
+  },
+  "integrations": {},
+  "scheduling": {}
+}
+```
+
+Example request body of managed instance update (PUT):
+
+```json
+{
+  "compute": {
+    "launchSpecification": {
+      "tags": [
+        {
+          "tagKey": "Environment",
+          "tagValue": "dev"
+        }
+      ]
+    }
+  }
+}
+```
+
 ## Authentication
 
-Authentication is accomplished via a pre-shared key.  This is done via the `X-Auth-Token` header.
+Authentication is accomplished via a pre-shared key in the `X-Auth-Token` header.
 
 ## Author
 
 E Camden Fisher <camden.fisher@yale.edu>
+Tenyo Grozev <tenyo.grozev@yale.edu>
 
 ## License
 
 GNU Affero General Public License v3.0 (GNU AGPLv3)  
-Copyright (c) 2019 Yale University
+Copyright (c) 2020 Yale University
