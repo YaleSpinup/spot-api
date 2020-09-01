@@ -1,7 +1,7 @@
 package spotinst
 
 import (
-	"github.com/YaleSpinup/spot-api/apierror"
+	"github.com/YaleSpinup/apierror"
 )
 
 func ErrCode(msg string, err error) error {

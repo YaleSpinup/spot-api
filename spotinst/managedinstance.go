@@ -3,7 +3,7 @@ package spotinst
 import (
 	"context"
 
-	"github.com/YaleSpinup/spot-api/apierror"
+	"github.com/YaleSpinup/apierror"
 	log "github.com/sirupsen/logrus"
 	"github.com/spotinst/spotinst-sdk-go/service/managedinstance/providers/aws"
 	"github.com/spotinst/spotinst-sdk-go/spotinst"

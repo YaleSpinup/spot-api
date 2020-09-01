@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/YaleSpinup/spot-api/apierror"
+	"github.com/YaleSpinup/apierror"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	"github.com/spotinst/spotinst-sdk-go/service/elastigroup/providers/aws"

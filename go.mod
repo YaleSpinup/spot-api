@@ -3,6 +3,7 @@ module github.com/YaleSpinup/spot-api
 go 1.15
 
 require (
+	github.com/YaleSpinup/apierror v0.1.0
 	github.com/go-ini/ini v1.60.0 // indirect
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.4
