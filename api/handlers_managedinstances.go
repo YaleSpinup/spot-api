@@ -59,7 +59,7 @@ func (s *server) ManagedInstanceShowHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	managedinstance := vars["managedinstance"]
+	managedinstance := vars["instance"]
 
 	output, err := miService.GetAWSManagedInstanceByID(r.Context(), managedinstance)
 	if err != nil {
@@ -129,7 +129,7 @@ func (s *server) ManagedInstanceUpdateHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	managedinstance := vars["managedinstance"]
+	managedinstance := vars["instance"]
 
 	req := aws.ManagedInstance{}
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -173,7 +173,7 @@ func (s *server) ManagedInstanceDeleteHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	managedinstance := vars["managedinstance"]
+	managedinstance := vars["instance"]
 
 	err := miService.DeleteAWSManagedInstanceByID(r.Context(), managedinstance)
 	if err != nil {

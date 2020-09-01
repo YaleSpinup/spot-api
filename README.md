@@ -14,10 +14,10 @@ POST /v1/spot/{account}/elastigroups
 PUT /v1/spot/{account}/elastigroups/{elastigroup}
 DELETE /v1/spot/{account}/elastigroups/{elastigroup}
 
-GET /v1/spot/{account}/managedinstances
-POST /v1/spot/{account}/managedinstances
-PUT /v1/spot/{account}/managedinstances/{managedinstance}
-DELETE /v1/spot/{account}/managedinstances/{managedinstance}
+GET /v1/spot/{account}/instances
+POST /v1/spot/{account}/instances
+PUT /v1/spot/{account}/instances/{instance}
+DELETE /v1/spot/{account}/instances/{instance}
 ```
 
 ## Examples
