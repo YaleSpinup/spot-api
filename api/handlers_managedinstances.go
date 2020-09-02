@@ -8,36 +8,36 @@ import (
 	"github.com/YaleSpinup/apierror"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
-	"github.com/spotinst/spotinst-sdk-go/service/elastigroup/providers/aws"
+	"github.com/spotinst/spotinst-sdk-go/service/managedinstance/providers/aws"
 	"github.com/spotinst/spotinst-sdk-go/spotinst"
 )
 
-// ElastigroupsListHandler handles listing elastigroups in SpotInst
-func (s *server) ElastigroupsListHandler(w http.ResponseWriter, r *http.Request) {
+// ManagedInstanceListHandler handles listing managed instances in SpotInst
+func (s *server) ManagedInstanceListHandler(w http.ResponseWriter, r *http.Request) {
 	w = LogWriter{w}
 	vars := mux.Vars(r)
 	account := vars["account"]
-	esService, ok := s.elastigroupServices[account]
+	miService, ok := s.managedinstanceServices[account]
 	if !ok {
 		log.Errorf("account not found: %s", account)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	output, err := esService.ListAWSElastigroups(r.Context())
+	output, err := miService.ListAWSManagedInstances(r.Context())
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	groups := []string{}
-	for _, g := range output {
-		groups = append(groups, spotinst.StringValue(g.ID))
+	instances := []string{}
+	for _, i := range output {
+		instances = append(instances, spotinst.StringValue(i.ID))
 	}
 
-	j, err := json.Marshal(groups)
+	j, err := json.Marshal(instances)
 	if err != nil {
-		log.Errorf("cannot marshal response (%v) into JSON: %s", groups, err)
+		log.Errorf("cannot marshal response (%v) into JSON: %s", instances, err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -47,21 +47,21 @@ func (s *server) ElastigroupsListHandler(w http.ResponseWriter, r *http.Request)
 	w.Write(j)
 }
 
-// ElastigroupShowHandler handles getting details about an elastigroup from SpotInst
-func (s *server) ElastigroupShowHandler(w http.ResponseWriter, r *http.Request) {
+// ManagedInstanceShowHandler handles getting details about a managed instance from SpotInst
+func (s *server) ManagedInstanceShowHandler(w http.ResponseWriter, r *http.Request) {
 	w = LogWriter{w}
 	vars := mux.Vars(r)
 	account := vars["account"]
-	esService, ok := s.elastigroupServices[account]
+	miService, ok := s.managedinstanceServices[account]
 	if !ok {
 		log.Errorf("account not found: %s", account)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	elastigroup := vars["elastigroup"]
+	managedinstance := vars["instance"]
 
-	output, err := esService.GetAWSElastigroupByID(r.Context(), elastigroup)
+	output, err := miService.GetAWSManagedInstanceByID(r.Context(), managedinstance)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -79,32 +79,70 @@ func (s *server) ElastigroupShowHandler(w http.ResponseWriter, r *http.Request) 
 	w.Write(j)
 }
 
-// ElastigroupUpdateHandler handles updating an elastigroup in SpotInst
-func (s *server) ElastigroupUpdateHandler(w http.ResponseWriter, r *http.Request) {
+// ManagedInstanceCreateHandler handles creating a managed instance in SpotInst
+func (s *server) ManagedInstanceCreateHandler(w http.ResponseWriter, r *http.Request) {
 	w = LogWriter{w}
 	vars := mux.Vars(r)
 	account := vars["account"]
-	esService, ok := s.elastigroupServices[account]
+	miService, ok := s.managedinstanceServices[account]
 	if !ok {
 		log.Errorf("account not found: %s", account)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	elastigroup := vars["elastigroup"]
-
-	req := aws.Group{}
+	req := aws.ManagedInstance{}
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		msg := fmt.Sprintf("cannot decode body into update elastigroup input: %s", err)
+		msg := fmt.Sprintf("cannot decode body into create elastigroup input: %s", err)
 		handleError(w, apierror.New(apierror.ErrBadRequest, msg, err))
 		return
 	}
 
-	// assert {elastigroup} from querystring route on req object
-	req.ID = spotinst.String(elastigroup)
+	output, err := miService.CreateAWSManagedInstance(r.Context(), &req)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
 
-	output, err := esService.UpdateAWSElastigroup(r.Context(), &req)
+	j, err := json.Marshal(output)
+	if err != nil {
+		log.Errorf("cannot marshal response (%v) into JSON: %s", output, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(j)
+}
+
+// ManagedInstanceUpdateHandler handles updating a managed instance in SpotInst
+func (s *server) ManagedInstanceUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	w = LogWriter{w}
+	vars := mux.Vars(r)
+	account := vars["account"]
+	miService, ok := s.managedinstanceServices[account]
+	if !ok {
+		log.Errorf("account not found: %s", account)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	managedinstance := vars["instance"]
+
+	req := aws.ManagedInstance{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		msg := fmt.Sprintf("cannot decode body into update managed instance input: %s", err)
+		handleError(w, apierror.New(apierror.ErrBadRequest, msg, err))
+		return
+	}
+
+	// assert {managedinstance} from querystring route on req object
+	req.ID = spotinst.String(managedinstance)
+
+	output, err := miService.UpdateAWSManagedInstance(r.Context(), &req)
 	if err != nil {
 		msg := fmt.Sprintf("%s", err)
 		handleError(w, apierror.New(apierror.ErrBadRequest, msg, err))
@@ -123,59 +161,21 @@ func (s *server) ElastigroupUpdateHandler(w http.ResponseWriter, r *http.Request
 	w.Write(j)
 }
 
-// ElastigroupCreateHandler handles creating an elastigroup in SpotInst
-func (s *server) ElastigroupCreateHandler(w http.ResponseWriter, r *http.Request) {
+// ManagedInstanceDeleteHandler handles deleting a managed instance from SpotInst
+func (s *server) ManagedInstanceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	w = LogWriter{w}
 	vars := mux.Vars(r)
 	account := vars["account"]
-	esService, ok := s.elastigroupServices[account]
+	miService, ok := s.managedinstanceServices[account]
 	if !ok {
 		log.Errorf("account not found: %s", account)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	req := aws.Group{}
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		msg := fmt.Sprintf("cannot decode body into create elastigroup input: %s", err)
-		handleError(w, apierror.New(apierror.ErrBadRequest, msg, err))
-		return
-	}
+	managedinstance := vars["instance"]
 
-	output, err := esService.CreateAWSElastigroup(r.Context(), &req)
-	if err != nil {
-		handleError(w, err)
-		return
-	}
-
-	j, err := json.Marshal(output)
-	if err != nil {
-		log.Errorf("cannot marshal response (%v) into JSON: %s", output, err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(j)
-}
-
-// ElastigroupDeleteHandler handles deleting an elastigroup from SpotInst
-func (s *server) ElastigroupDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	w = LogWriter{w}
-	vars := mux.Vars(r)
-	account := vars["account"]
-	esService, ok := s.elastigroupServices[account]
-	if !ok {
-		log.Errorf("account not found: %s", account)
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	elastigroup := vars["elastigroup"]
-
-	err := esService.DeleteAWSElastigroupByID(r.Context(), elastigroup)
+	err := miService.DeleteAWSManagedInstanceByID(r.Context(), managedinstance)
 	if err != nil {
 		handleError(w, err)
 		return

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/YaleSpinup/spot-api/apierror"
+	"github.com/YaleSpinup/apierror"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )

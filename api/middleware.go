@@ -30,9 +30,9 @@ func TokenMiddleware(psk string, public map[string]string, h http.Handler) http.
 		}
 
 		if _, ok := public[uri.Path]; ok {
-			log.Infof("Not authenticating for '%s'", uri.Path)
+			log.Debugf("Not authenticating for '%s'", uri.Path)
 		} else {
-			log.Infof("Authenticating token for protected URL '%s'", r.URL)
+			log.Debugf("Authenticating token for protected URL '%s'", r.URL)
 
 			htoken := r.Header.Get("X-Auth-Token")
 			if psk == htoken {

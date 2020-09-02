@@ -16,10 +16,11 @@ import (
 )
 
 type server struct {
-	elastigroupServices map[string]spotinst.Elastigroup
-	router              *mux.Router
-	version             common.Version
-	context             context.Context
+	elastigroupServices     map[string]spotinst.Elastigroup
+	managedinstanceServices map[string]spotinst.ManagedInstance
+	router                  *mux.Router
+	version                 common.Version
+	context                 context.Context
 }
 
 // Org will carry throughout the api and get tagged on resources
@@ -32,10 +33,11 @@ func NewServer(config common.Config) error {
 	defer cancel()
 
 	s := server{
-		elastigroupServices: make(map[string]spotinst.Elastigroup),
-		router:              mux.NewRouter(),
-		version:             config.Version,
-		context:             ctx,
+		elastigroupServices:     make(map[string]spotinst.Elastigroup),
+		managedinstanceServices: make(map[string]spotinst.ManagedInstance),
+		router:                  mux.NewRouter(),
+		version:                 config.Version,
+		context:                 ctx,
 	}
 
 	if config.Org == "" {
@@ -43,10 +45,11 @@ func NewServer(config common.Config) error {
 	}
 	Org = config.Org
 
-	// Create a shared S3 session
+	// Create a shared session
 	for name, c := range config.Accounts {
 		log.Debugf("Creating new Spot service for account '%s' with id %s (org: %s)", name, c.Id, Org)
 		s.elastigroupServices[name] = spotinst.NewElastigroupSession(c)
+		s.managedinstanceServices[name] = spotinst.NewManagedInstanceSession(c)
 	}
 
 	publicURLs := map[string]string{

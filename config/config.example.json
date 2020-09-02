@@ -3,8 +3,9 @@
   "accounts": {
     "someaccount": {
       "region": "us-east-1",
-      "akid": "xxxxxxxxxxxxxxxxxxxxxxxx",
-      "secret": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+      "id": "spot_account_id",
+      "token": "spot_token"
+    }
   },
   "token": "xxxxxx",
   "logLevel": "info",
