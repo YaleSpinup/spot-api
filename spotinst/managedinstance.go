@@ -41,7 +41,7 @@ func (m *ManagedInstance) GetAWSManagedInstanceByID(ctx context.Context, id stri
 }
 
 // CreateAWSManagedInstance creates a managed instance
-func (m *ManagedInstance) CreateAWSManagedInstance(ctx context.Context, input *aws.ManagedInstance) (*aws.ManagedInstance, error) {
+func (m *ManagedInstance) CreateAWSManagedInstance(ctx context.Context, input *aws.ManagedInstance) (*string, error) {
 	if input == nil {
 		return nil, apierror.New(apierror.ErrBadRequest, "invalid input", nil)
 	}
@@ -56,7 +56,7 @@ func (m *ManagedInstance) CreateAWSManagedInstance(ctx context.Context, input *a
 		return nil, ErrCode("failed to create managed instance", err)
 	}
 
-	return output.ManagedInstance, nil
+	return output.ManagedInstance.ID, nil
 }
 
 // UpdateAWSManagedInstance updates facets on a managed instance

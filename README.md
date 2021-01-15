@@ -11,11 +11,13 @@ GET /v1/spot/metrics
 
 GET /v1/spot/{account}/elastigroups
 POST /v1/spot/{account}/elastigroups
+GET /v1/spot/{account}/elastigroups/{elastigroup}
 PUT /v1/spot/{account}/elastigroups/{elastigroup}
 DELETE /v1/spot/{account}/elastigroups/{elastigroup}
 
 GET /v1/spot/{account}/instances
 POST /v1/spot/{account}/instances
+GET /v1/spot/{account}/instances/{instance}
 PUT /v1/spot/{account}/instances/{instance}
 DELETE /v1/spot/{account}/instances/{instance}
 ```
@@ -216,7 +218,7 @@ Example request body of managed instance update (PUT):
 
 ## Authentication
 
-Authentication is accomplished via a pre-shared key in the `X-Auth-Token` header.
+Authentication is accomplished using a pre-shared key (hashed string) in the `X-Auth-Token` header.
 
 ## Author
 
