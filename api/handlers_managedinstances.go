@@ -86,8 +86,8 @@ func (s *server) ManagedInstanceShowHandler(w http.ResponseWriter, r *http.Reque
 	instanceDetails := ManagedInstanceDetails{
 		ID:         *output.ID,
 		Name:       *output.Name,
-		CreatedAt:  output.CreatedAt.Format("2006-01-02 15:04:05"),
-		ModifiedAt: output.UpdatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt:  output.CreatedAt.Format("2006/01/02 15:04:05"),
+		ModifiedAt: output.UpdatedAt.Format("2006/01/02 15:04:05"),
 		Size:       *output.Compute.LaunchSpecification.InstanceTypes.PreferredType,
 		Tags:       transformTags(Org, *output.Name, output.Compute.LaunchSpecification.Tags),
 	}
