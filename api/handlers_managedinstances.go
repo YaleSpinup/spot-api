@@ -13,18 +13,18 @@ import (
 )
 
 type ManagedInstanceListDetails struct {
-	ID string
+	ID string `json:"id"`
 }
 
 // ManagedInstanceDetails defines the information about a managed instance
 type ManagedInstanceDetails struct {
-	ID         string
-	CreatedAt  string `json:"created_at,omitempty"`
-	ModifiedAt string `json:"modified_at,omitempty"`
-	Name       string
-	Size       string `json:"type,omitempty"`
-	State      string
-	Tags       []map[string]string
+	ID         string              `json:"id"`
+	CreatedAt  string              `json:"created_at,omitempty"`
+	ModifiedAt string              `json:"modified_at,omitempty"`
+	Name       string              `json:"name"`
+	Size       string              `json:"type,omitempty"`
+	State      string              `json:"state"`
+	Tags       []map[string]string `json:"tags"`
 }
 
 // ManagedInstanceListHandler handles listing managed instances in SpotInst
