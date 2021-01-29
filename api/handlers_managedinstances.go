@@ -12,6 +12,21 @@ import (
 	"github.com/spotinst/spotinst-sdk-go/spotinst"
 )
 
+type ManagedInstanceListDetails struct {
+	ID string `json:"id"`
+}
+
+// ManagedInstanceDetails defines the information about a managed instance
+type ManagedInstanceDetails struct {
+	ID         string              `json:"id"`
+	CreatedAt  string              `json:"created_at,omitempty"`
+	ModifiedAt string              `json:"modified_at,omitempty"`
+	Name       string              `json:"name"`
+	Size       string              `json:"type,omitempty"`
+	State      string              `json:"state"`
+	Tags       []map[string]string `json:"tags"`
+}
+
 // ManagedInstanceListHandler handles listing managed instances in SpotInst
 func (s *server) ManagedInstanceListHandler(w http.ResponseWriter, r *http.Request) {
 	w = LogWriter{w}
@@ -30,9 +45,10 @@ func (s *server) ManagedInstanceListHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	instances := []string{}
+	instances := []ManagedInstanceListDetails{}
+
 	for _, i := range output {
-		instances = append(instances, spotinst.StringValue(i.ID))
+		instances = append(instances, ManagedInstanceListDetails{spotinst.StringValue(i.ID)})
 	}
 
 	j, err := json.Marshal(instances)
@@ -67,7 +83,16 @@ func (s *server) ManagedInstanceShowHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	j, err := json.Marshal(output)
+	instanceDetails := ManagedInstanceDetails{
+		ID:         *output.ID,
+		Name:       *output.Name,
+		CreatedAt:  output.CreatedAt.Format("2006/01/02 15:04:05"),
+		ModifiedAt: output.UpdatedAt.Format("2006/01/02 15:04:05"),
+		Size:       *output.Compute.LaunchSpecification.InstanceTypes.PreferredType,
+		Tags:       transformTags(Org, *output.Name, output.Compute.LaunchSpecification.Tags),
+	}
+
+	j, err := json.Marshal(instanceDetails)
 	if err != nil {
 		log.Errorf("cannot marshal response (%v) into JSON: %s", output, err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -183,4 +208,31 @@ func (s *server) ManagedInstanceDeleteHandler(w http.ResponseWriter, r *http.Req
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
+}
+
+func transformTags(org, name string, tags []*aws.Tag) []map[string]string {
+	transformedTags := []map[string]string{}
+	for _, t := range tags {
+		if *t.Key == "spinup:org" || *t.Key == "Name" {
+			continue
+		}
+		transformedTags = append(transformedTags, map[string]string{*t.Key: *t.Value})
+	}
+
+	transformedTags = append(transformedTags,
+		map[string]string{"Name": name},
+		map[string]string{"spinup:org": org},
+	)
+
+	log.Debugf("returning transformed tags: %+v", transformedTags)
+	return transformedTags
+}
+
+// ManagedVolumesListHandler handles listing managed instance volumes
+func (s *server) ManagedVolumesListHandler(w http.ResponseWriter, r *http.Request) {
+	w = LogWriter{w}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNotImplemented)
+	w.Write([]byte{})
 }
