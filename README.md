@@ -18,6 +18,7 @@ DELETE /v1/spot/{account}/elastigroups/{elastigroup}
 GET /v1/spot/{account}/instances
 POST /v1/spot/{account}/instances
 GET /v1/spot/{account}/instances/{instance}
+GET /v1/spot/{account}/instances/{instance}/status
 PUT /v1/spot/{account}/instances/{instance}
 DELETE /v1/spot/{account}/instances/{instance}
 ```

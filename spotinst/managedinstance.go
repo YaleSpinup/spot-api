@@ -40,6 +40,25 @@ func (m *ManagedInstance) GetAWSManagedInstanceByID(ctx context.Context, id stri
 	return output.ManagedInstance, nil
 }
 
+// GetAWSManagedInstanceStatusByID gets status from cloud provider about existing managed instance by id
+func (m *ManagedInstance) GetAWSManagedInstanceStatusByID(ctx context.Context, id string) (*aws.StatusManagedInstanceOutput, error) {
+	if id == "" {
+		return nil, apierror.New(apierror.ErrBadRequest, "invalid input", nil)
+	}
+
+	log.Infof("getting status details for aws managed instance: %s", id)
+
+	output, err := m.Service.CloudProviderAWS().Status(ctx, &aws.StatusManagedInstanceInput{
+		ManagedInstanceID: spotinst.String(id),
+	})
+
+	if err != nil {
+		return nil, ErrCode("failed to get status details for managed instance", err)
+	}
+
+	return output, nil
+}
+
 // CreateAWSManagedInstance creates a managed instance
 func (m *ManagedInstance) CreateAWSManagedInstance(ctx context.Context, input *aws.ManagedInstance) (*string, error) {
 	if input == nil {
