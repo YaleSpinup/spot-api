@@ -25,5 +25,6 @@ func (s *server) routes() {
 	api.HandleFunc("/{account}/instances/{instance}", s.ManagedInstanceUpdateHandler).Methods(http.MethodPut)
 	api.HandleFunc("/{account}/instances/{instance}", s.ManagedInstanceShowHandler).Methods(http.MethodGet)
 	api.HandleFunc("/{account}/instances/{instance}", s.ManagedInstanceDeleteHandler).Methods(http.MethodDelete)
+	api.HandleFunc("/{account}/instances/{instance}/status", s.ManagedInstanceStatusHandler).Methods(http.MethodGet)
 	api.HandleFunc("/{account}/volumes", s.ManagedVolumesListHandler).Methods(http.MethodGet)
 }

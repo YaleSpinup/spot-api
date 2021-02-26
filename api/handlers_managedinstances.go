@@ -104,6 +104,38 @@ func (s *server) ManagedInstanceShowHandler(w http.ResponseWriter, r *http.Reque
 	w.Write(j)
 }
 
+// ManagedInstanceStatusHandler handles getting status details about a managed instance from SpotInst
+func (s *server) ManagedInstanceStatusHandler(w http.ResponseWriter, r *http.Request) {
+	w = LogWriter{w}
+	vars := mux.Vars(r)
+	account := vars["account"]
+	miService, ok := s.managedinstanceServices[account]
+	if !ok {
+		log.Errorf("account not found: %s", account)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	managedinstance := vars["instance"]
+
+	output, err := miService.GetAWSManagedInstanceStatusByID(r.Context(), managedinstance)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	j, err := json.Marshal(output)
+	if err != nil {
+		log.Errorf("cannot marshal response (%v) into JSON: %s", output, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(j)
+}
+
 // ManagedInstanceCreateHandler handles creating a managed instance in SpotInst
 func (s *server) ManagedInstanceCreateHandler(w http.ResponseWriter, r *http.Request) {
 	w = LogWriter{w}
