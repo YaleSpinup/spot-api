@@ -118,6 +118,14 @@ func (s *server) ManagedInstanceStatusHandler(w http.ResponseWriter, r *http.Req
 
 	managedinstance := vars["instance"]
 
+	// we'll try to get the instance first in case it doesn't exist
+	// since the status call does not return a not found error
+	_, err := miService.GetAWSManagedInstanceByID(r.Context(), managedinstance)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
 	output, err := miService.GetAWSManagedInstanceStatusByID(r.Context(), managedinstance)
 	if err != nil {
 		handleError(w, err)
