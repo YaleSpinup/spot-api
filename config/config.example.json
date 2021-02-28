@@ -4,7 +4,8 @@
     "someaccount": {
       "region": "us-east-1",
       "id": "spot_account_id",
-      "token": "spot_token"
+      "token": "spot_token",
+      "defaultVPC": "vpc-1234567890"
     }
   },
   "token": "xxxxxx",

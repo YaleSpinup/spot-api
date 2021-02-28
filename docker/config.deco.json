@@ -4,17 +4,20 @@
     "sandbox": {
       "region": "us-east-1",
       "id": "{{ .sandbox_account_id }}",
-      "token": "{{ .sandbox_token }}"
+      "token": "{{ .sandbox_token }}",
+      "defaultVPC": "{{ .sandbox_default_vpc }}"
     },
     "spinup": {
       "region": "us-east-1",
       "id": "{{ .spinup_account_id }}",
-      "token": "{{ .spinup_token }}"
+      "token": "{{ .spinup_token }}",
+      "defaultVPC": "{{ .spinup_default_vpc }}"
     },
     "spinupsec": {
       "region": "us-east-1",
       "id": "{{ .spinupsec_account_id }}",
-      "token": "{{ .spinupsec_token }}"
+      "token": "{{ .spinupsec_token }}",
+      "defaultVPC": "{{ .spinupsec_default_vpc }}"
     }
   },
   "token": "{{ .api_token }}",
