@@ -156,6 +156,11 @@ func (s *server) ManagedInstanceCreateHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	// use the DefaultVPC if VpcID is not passed
+	if req.Compute != nil && req.Compute.VpcID == nil && miService.DefaultVPC != "" {
+		req.Compute.VpcID = &miService.DefaultVPC
+	}
+
 	output, err := miService.CreateAWSManagedInstance(r.Context(), &req)
 	if err != nil {
 		handleError(w, err)

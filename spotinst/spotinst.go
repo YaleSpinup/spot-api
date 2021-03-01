@@ -17,7 +17,8 @@ type Elastigroup struct {
 
 // ManagedInstance is a wrapper around the spotinst managedinstance service and the provider type (eg. aws, azure, gcp, etc)
 type ManagedInstance struct {
-	Service managedinstance.Service
+	Service    managedinstance.Service
+	DefaultVPC string
 }
 
 // NewElastigroupSession creates a new elastigroup session
@@ -39,5 +40,6 @@ func NewManagedInstanceSession(account common.Account) ManagedInstance {
 		Credentials: credentials.NewStaticCredentials(account.Token, account.Id),
 	})
 	m.Service = managedinstance.New(sess)
+	m.DefaultVPC = account.DefaultVPC
 	return m
 }

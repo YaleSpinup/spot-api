@@ -20,10 +20,11 @@ type Config struct {
 
 // Account is the configuration for an individual account
 type Account struct {
-	Endpoint string
-	Region   string
-	Id       string
-	Token    string
+	Endpoint   string
+	Region     string
+	Id         string
+	Token      string
+	DefaultVPC string
 }
 
 // Version carries around the API version information
