@@ -40,6 +40,32 @@ func (m *ManagedInstance) GetAWSManagedInstanceByID(ctx context.Context, id stri
 	return output.ManagedInstance, nil
 }
 
+// GetAWSManagedInstanceCostsByID gets costs from cloud provider about existing managed instance by id
+func (m *ManagedInstance) GetAWSManagedInstanceCostsByID(ctx context.Context, id, fromDate, toDate string) (*aws.CostsManagedInstanceOutput, error) {
+	if id == "" {
+		return nil, apierror.New(apierror.ErrBadRequest, "invalid input", nil)
+	}
+
+	log.Infof("getting costs details for aws managed instance: %s (fromDate: %s, toDate: %s)", id, fromDate, toDate)
+
+	input := &aws.CostsManagedInstanceInput{
+		ManagedInstanceID: spotinst.String(id),
+	}
+
+	if fromDate != "" && toDate != "" {
+		input.FromDate = spotinst.String(fromDate)
+		input.ToDate = spotinst.String(toDate)
+	}
+
+	output, err := m.Service.CloudProviderAWS().Costs(ctx, input)
+
+	if err != nil {
+		return nil, ErrCode("failed to get costs details for managed instance", err)
+	}
+
+	return output, nil
+}
+
 // GetAWSManagedInstanceStatusByID gets status from cloud provider about existing managed instance by id
 func (m *ManagedInstance) GetAWSManagedInstanceStatusByID(ctx context.Context, id string) (*aws.StatusManagedInstanceOutput, error) {
 	if id == "" {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/YaleSpinup/apierror"
 	"github.com/gorilla/mux"
@@ -126,6 +127,53 @@ func (s *server) ManagedInstanceStatusHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	output, err := miService.GetAWSManagedInstanceStatusByID(r.Context(), managedinstance)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	j, err := json.Marshal(output)
+	if err != nil {
+		log.Errorf("cannot marshal response (%v) into JSON: %s", output, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(j)
+}
+
+// ManagedInstanceCostsHandler handles getting costs details about a managed instance from SpotInst
+func (s *server) ManagedInstanceCostsHandler(w http.ResponseWriter, r *http.Request) {
+	w = LogWriter{w}
+	vars := mux.Vars(r)
+	params := r.URL.Query()
+
+	account := vars["account"]
+	miService, ok := s.managedinstanceServices[account]
+	if !ok {
+		log.Errorf("account not found: %s", account)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	managedinstance := vars["instance"]
+
+	startDate, endDate, err := parseDate(params.Get("start"), params.Get("end"))
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	// we'll try to get the instance first in case it doesn't exist
+	// since the costs call does not return a not found error
+	if _, err := miService.GetAWSManagedInstanceByID(r.Context(), managedinstance); err != nil {
+		handleError(w, err)
+		return
+	}
+
+	output, err := miService.GetAWSManagedInstanceCostsByID(r.Context(), managedinstance, startDate, endDate)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -279,4 +327,37 @@ func (s *server) ManagedVolumesListHandler(w http.ResponseWriter, r *http.Reques
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNotImplemented)
 	w.Write([]byte{})
+}
+
+// parseDate returns date parsed from query parameters
+func parseDate(startDate, endDate string) (string, string, error) {
+	log.Debugf("startDate: %s, endDate: %s ", startDate, endDate)
+
+	if startDate == "" && endDate == "" {
+		return "", "", nil
+	}
+
+	if (startDate == "" && endDate != "") || (startDate != "" && endDate == "") {
+		return "", "", apierror.New(apierror.ErrBadRequest, "both start and end dates must be specified", nil)
+	}
+
+	// sTmp and eTmp temporary vars to hold time.Time objects
+	sTmp, err := time.Parse("2006-01-02", startDate)
+	if err != nil {
+		return "", "", apierror.New(apierror.ErrBadRequest, "error parsing start date from input", err)
+	}
+
+	eTmp, err := time.Parse("2006-01-02", endDate)
+	if err != nil {
+		return "", "", apierror.New(apierror.ErrBadRequest, "error parsing end date from input", err)
+	}
+
+	// check that end date is greater than start date
+	timeValidity := eTmp.After(sTmp)
+	if !timeValidity {
+		return "", "", apierror.New(apierror.ErrBadRequest, "end date should be greater than start date", nil)
+	}
+
+	// convert time.Time to a string
+	return sTmp.Format("2006-01-02"), eTmp.Format("2006-01-02"), nil
 }
