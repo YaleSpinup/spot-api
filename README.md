@@ -18,6 +18,7 @@ DELETE /v1/spot/{account}/elastigroups/{elastigroup}
 GET /v1/spot/{account}/instances
 POST /v1/spot/{account}/instances
 GET /v1/spot/{account}/instances/{instance}
+GET /v1/spot/{account}/instances/{instance}/costs[?start=2021-05-01&end=2021-05-18]
 GET /v1/spot/{account}/instances/{instance}/status
 PUT /v1/spot/{account}/instances/{instance}
 DELETE /v1/spot/{account}/instances/{instance}
@@ -27,7 +28,7 @@ DELETE /v1/spot/{account}/instances/{instance}
 
 ### Elastigroups
 
-Example request body of new elastigroup (POST):
+#### Example request body of new elastigroup (POST):
 
 ```json
 {
@@ -97,7 +98,7 @@ Example request body of new elastigroup (POST):
 }
 ```
 
-Example request body of elastigroup update (PUT):
+#### Example request body of elastigroup update (PUT):
 
 ```json
 {
@@ -131,7 +132,7 @@ Example request body of elastigroup update (PUT):
 
 ### Managed Instances
 
-Example request body of new managed instance (POST):
+#### Example request body of new managed instance (POST):
 
 ```json
 {
@@ -200,7 +201,7 @@ Example request body of new managed instance (POST):
 }
 ```
 
-Example request body of managed instance update (PUT):
+#### Example request body of managed instance update (PUT):
 
 ```json
 {
@@ -217,6 +218,31 @@ Example request body of managed instance update (PUT):
 }
 ```
 
+#### Get the costs and savings for a managed instance
+
+By default, this will get all the incurred costs for a managed instance. You can specify start and end dates to get the costs for a period of time.
+
+```
+GET /v1/spot/{account}/instances/{instance}/costs?start=2021-05-10&end=2021-05-15
+```
+
+```json
+{
+    "costs": {
+        "actual": 0.1581,
+        "potential": 0.4794
+    },
+    "running": {
+        "unit": "hours",
+        "value": 51
+    },
+    "savings": {
+        "unit": "percentage",
+        "value": 67.0213
+    }
+}
+```
+
 ## Authentication
 
 Authentication is accomplished using a pre-shared key (hashed string) in the `X-Auth-Token` header.
@@ -229,4 +255,4 @@ Tenyo Grozev <tenyo.grozev@yale.edu>
 ## License
 
 GNU Affero General Public License v3.0 (GNU AGPLv3)  
-Copyright (c) 2020 Yale University
+Copyright (c) 2021 Yale University

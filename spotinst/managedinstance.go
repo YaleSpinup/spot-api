@@ -32,12 +32,36 @@ func (m *ManagedInstance) GetAWSManagedInstanceByID(ctx context.Context, id stri
 	output, err := m.Service.CloudProviderAWS().Read(ctx, &aws.ReadManagedInstanceInput{
 		ManagedInstanceID: spotinst.String(id),
 	})
-
 	if err != nil {
 		return nil, ErrCode("failed to read managed instance details", err)
 	}
 
 	return output.ManagedInstance, nil
+}
+
+// GetAWSManagedInstanceCostsByID gets costs from cloud provider about existing managed instance by id
+func (m *ManagedInstance) GetAWSManagedInstanceCostsByID(ctx context.Context, id, fromDate, toDate string) (*aws.CostsManagedInstanceOutput, error) {
+	if id == "" {
+		return nil, apierror.New(apierror.ErrBadRequest, "invalid input", nil)
+	}
+
+	log.Infof("getting costs details for aws managed instance: %s (fromDate: %s, toDate: %s)", id, fromDate, toDate)
+
+	input := aws.CostsManagedInstanceInput{
+		ManagedInstanceID: spotinst.String(id),
+	}
+
+	if fromDate != "" && toDate != "" {
+		input.FromDate = spotinst.String(fromDate)
+		input.ToDate = spotinst.String(toDate)
+	}
+
+	output, err := m.Service.CloudProviderAWS().Costs(ctx, &input)
+	if err != nil {
+		return nil, ErrCode("failed to get costs details for managed instance", err)
+	}
+
+	return output, nil
 }
 
 // GetAWSManagedInstanceStatusByID gets status from cloud provider about existing managed instance by id
@@ -51,7 +75,6 @@ func (m *ManagedInstance) GetAWSManagedInstanceStatusByID(ctx context.Context, i
 	output, err := m.Service.CloudProviderAWS().Status(ctx, &aws.StatusManagedInstanceInput{
 		ManagedInstanceID: spotinst.String(id),
 	})
-
 	if err != nil {
 		return nil, ErrCode("failed to get status details for managed instance", err)
 	}
@@ -70,7 +93,6 @@ func (m *ManagedInstance) CreateAWSManagedInstance(ctx context.Context, input *a
 	output, err := m.Service.CloudProviderAWS().Create(ctx, &aws.CreateManagedInstanceInput{
 		ManagedInstance: input,
 	})
-
 	if err != nil {
 		return nil, ErrCode("failed to create managed instance", err)
 	}
@@ -105,7 +127,6 @@ func (m *ManagedInstance) DeleteAWSManagedInstanceByID(ctx context.Context, id s
 	_, err := m.Service.CloudProviderAWS().Delete(ctx, &aws.DeleteManagedInstanceInput{
 		ManagedInstanceID: spotinst.String(id),
 	})
-
 	if err != nil {
 		return ErrCode("failed to delete managed instance", err)
 	}
