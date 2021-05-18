@@ -32,7 +32,6 @@ func (m *ManagedInstance) GetAWSManagedInstanceByID(ctx context.Context, id stri
 	output, err := m.Service.CloudProviderAWS().Read(ctx, &aws.ReadManagedInstanceInput{
 		ManagedInstanceID: spotinst.String(id),
 	})
-
 	if err != nil {
 		return nil, ErrCode("failed to read managed instance details", err)
 	}
@@ -48,7 +47,7 @@ func (m *ManagedInstance) GetAWSManagedInstanceCostsByID(ctx context.Context, id
 
 	log.Infof("getting costs details for aws managed instance: %s (fromDate: %s, toDate: %s)", id, fromDate, toDate)
 
-	input := &aws.CostsManagedInstanceInput{
+	input := aws.CostsManagedInstanceInput{
 		ManagedInstanceID: spotinst.String(id),
 	}
 
@@ -57,8 +56,7 @@ func (m *ManagedInstance) GetAWSManagedInstanceCostsByID(ctx context.Context, id
 		input.ToDate = spotinst.String(toDate)
 	}
 
-	output, err := m.Service.CloudProviderAWS().Costs(ctx, input)
-
+	output, err := m.Service.CloudProviderAWS().Costs(ctx, &input)
 	if err != nil {
 		return nil, ErrCode("failed to get costs details for managed instance", err)
 	}
@@ -77,7 +75,6 @@ func (m *ManagedInstance) GetAWSManagedInstanceStatusByID(ctx context.Context, i
 	output, err := m.Service.CloudProviderAWS().Status(ctx, &aws.StatusManagedInstanceInput{
 		ManagedInstanceID: spotinst.String(id),
 	})
-
 	if err != nil {
 		return nil, ErrCode("failed to get status details for managed instance", err)
 	}
@@ -96,7 +93,6 @@ func (m *ManagedInstance) CreateAWSManagedInstance(ctx context.Context, input *a
 	output, err := m.Service.CloudProviderAWS().Create(ctx, &aws.CreateManagedInstanceInput{
 		ManagedInstance: input,
 	})
-
 	if err != nil {
 		return nil, ErrCode("failed to create managed instance", err)
 	}
@@ -131,7 +127,6 @@ func (m *ManagedInstance) DeleteAWSManagedInstanceByID(ctx context.Context, id s
 	_, err := m.Service.CloudProviderAWS().Delete(ctx, &aws.DeleteManagedInstanceInput{
 		ManagedInstanceID: spotinst.String(id),
 	})
-
 	if err != nil {
 		return ErrCode("failed to delete managed instance", err)
 	}
