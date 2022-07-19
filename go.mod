@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/YaleSpinup/apierror v0.1.0
+	github.com/aws/aws-sdk-go v1.27.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
 	github.com/pkg/errors v0.9.1

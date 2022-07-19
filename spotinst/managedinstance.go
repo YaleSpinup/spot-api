@@ -13,7 +13,9 @@ import (
 func (m *ManagedInstance) ListAWSManagedInstances(ctx context.Context) ([]*aws.ManagedInstance, error) {
 	log.Info("listing aws managed instances")
 
-	output, err := m.Service.CloudProviderAWS().List(ctx, &aws.ListManagedInstancesInput{})
+	s := m.Service
+	cp := s.CloudProviderAWS()
+	output, err := cp.List(ctx, &aws.ListManagedInstancesInput{})
 	if err != nil {
 		return nil, ErrCode("failed to list managed instances", err)
 	}

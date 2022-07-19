@@ -1,6 +1,7 @@
 package spotinst
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -49,4 +50,6 @@ func TestNewManagedInstanceSession(t *testing.T) {
 	if to := reflect.TypeOf(m).String(); to != "spotinst.ManagedInstance" {
 		t.Errorf("expected type to be 'spotinst.ManagedInstance', got %s", to)
 	}
+	cp := m.Service.CloudProviderAWS()
+	fmt.Println(cp)
 }
