@@ -126,6 +126,13 @@ func (m *ManagedInstance) DeleteAWSManagedInstanceByID(ctx context.Context, id s
 
 	_, err := m.Service.CloudProviderAWS().Delete(ctx, &aws.DeleteManagedInstanceInput{
 		ManagedInstanceID: spotinst.String(id),
+		DeallocationConfig: &aws.DeallocationConfig{
+			ShouldDeleteImages:            spotinst.Bool(true),
+			ShouldDeleteNetworkInterfaces: spotinst.Bool(true),
+			ShouldDeleteSnapshots:         spotinst.Bool(true),
+			ShouldDeleteVolumes:           spotinst.Bool(true),
+			ShouldTerminateInstance:       spotinst.Bool(true),
+		},
 	})
 	if err != nil {
 		return ErrCode("failed to delete managed instance", err)
