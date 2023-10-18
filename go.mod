@@ -9,7 +9,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.12.2
 	github.com/sirupsen/logrus v1.9.0
-	github.com/spotinst/spotinst-sdk-go v1.124.0
+	github.com/spotinst/spotinst-sdk-go v1.334.0
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 )
 
